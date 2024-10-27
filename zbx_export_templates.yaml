@@ -1,0 +1,157 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    - uuid: 70cb75aa4f954c5993e09294ade36d2f
+      template: 'Template Check Remote DNS'
+      name: 'Template Check Remote DNS'
+      groups:
+        - name: Templates
+      items:
+        - uuid: eb58a545b1ae49b685e36b6789b77e2b
+          name: 'DNS Remote Check Data'
+          type: EXTERNAL
+          key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          value_type: TEXT
+          trends: '0'
+          tags:
+            - tag: component
+              value: dns
+        - uuid: 00233dc2115d46a987a988dada13e69b
+          name: 'DNS Remote Check Verfügbar'
+          type: DEPENDENT
+          key: check_dns_remote.alive
+          delay: '0'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.alive
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: dns
+              value: component
+          triggers:
+            - uuid: 294d4e712983476686d1d7ce7f6ee746
+              expression: 'last(/Template Check Remote DNS/check_dns_remote.alive)<>1'
+              name: 'DNS Server auf Host {HOST.HOST} ist nicht verfügbar'
+              priority: HIGH
+        - uuid: 9c9ae36c97274abea7f695812e4ca9f0
+          name: 'DNS Remote Check Erwartete Antwort'
+          type: DEPENDENT
+          key: check_dns_remote.expected
+          delay: '0'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.expected
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: component
+              value: dns
+        - uuid: 7f5627cb6c414c6d995a0ed4b473fc97
+          name: 'DNS Remote Check Ist erwartete Antwort'
+          type: DEPENDENT
+          key: check_dns_remote.expected_exists
+          delay: '0'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.expected_exists
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: component
+              value: dns
+        - uuid: f3c67110f9334fefba9bef0fbd8adead
+          name: 'DNS Remote Check Hostname'
+          type: DEPENDENT
+          key: check_dns_remote.hostname
+          delay: '0'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.hostname
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: component
+              value: dns
+        - uuid: 9948ec54b9de4b7ba4a302121cb1f522
+          name: 'DNS Remote Check Nameserver'
+          type: DEPENDENT
+          key: check_dns_remote.nameserver
+          delay: '0'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nameserver
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: component
+              value: dns
+        - uuid: 51dd47c23b374b1ca48874d40cce2937
+          name: 'DNS Remote Check Port'
+          type: DEPENDENT
+          key: check_dns_remote.port
+          delay: '0'
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.port
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: dns
+              value: component
+        - uuid: fb5c274b6ed649f091f426be319263de
+          name: 'DNS Remote Check Eintrag'
+          type: DEPENDENT
+          key: check_dns_remote.record
+          delay: '0'
+          value_type: TEXT
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.record
+          master_item:
+            key: 'check_dns.py["--nameserver={HOST.IP}", "--hostname={$CHECK_DNS_REMOTE_HOSTNAME}", "--record={$CHECK_DNS_REMOTE_RECORD}", "--port={$CHECK_DNS_REMOTE_PORT}", "--expected={$CHECK_DNS_REMOTE_EXPECTED}"]'
+          tags:
+            - tag: component
+              value: dns
+      macros:
+        - macro: '{$CHECK_DNS_REMOTE_EXPECTED}'
+        - macro: '{$CHECK_DNS_REMOTE_HOSTNAME}'
+          value: hank-it.com
+        - macro: '{$CHECK_DNS_REMOTE_PORT}'
+          value: '53'
+        - macro: '{$CHECK_DNS_REMOTE_RECORD}'
+          value: A
+      valuemaps:
+        - uuid: 11ab66525532493eb30fc8d3c7672193
+          name: Boolean
+          mappings:
+            - value: 'true'
+              newvalue: Ja
+            - value: 'false'
+              newvalue: Nein
+            - value: '1'
+              newvalue: Ja
+            - value: '0'
+              newvalue: Nein
