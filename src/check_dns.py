@@ -29,17 +29,17 @@ def main(argv):
         answer = dns.resolver.resolve_at(nameserver, hostname, record, port=port)
 
         if expected:
-            expect_exists = False
+            expect_exists = 0
 
             for entry in answer:
                 if str(entry) == expected:
-                    expect_exists = True
+                    expect_exists = 1
 
-        print(json.dumps({"alive": True, "expected_exists": expect_exists, "nameserver": nameserver, "hostname": hostname, "record": record, "port": port, "expected": expected}))
+        print(json.dumps({"alive": 1, "expected_exists": expect_exists, "nameserver": nameserver, "hostname": hostname, "record": record, "port": port, "expected": expected}))
     except dns.resolver.LifetimeTimeout:
-        print(json.dumps({"alive": False, "error": "timeout", "nameserver": nameserver, "hostname": hostname, "record": record, "port": port, "expected": expected}))
+        print(json.dumps({"alive": 0, "error": "timeout", "nameserver": nameserver, "hostname": hostname, "record": record, "port": port, "expected": expected}))
     except Exception as e:
-        print(json.dumps({"alive": False, "error": repr(e), "nameserver": nameserver, "hostname": hostname, "record": record, "port": port, "expected": expected}))
+        print(json.dumps({"alive": 0, "error": repr(e), "nameserver": nameserver, "hostname": hostname, "record": record, "port": port, "expected": expected}))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
