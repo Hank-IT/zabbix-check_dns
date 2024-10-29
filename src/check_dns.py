@@ -2,11 +2,16 @@
 
 import sys, getopt, json, dns.resolver
 
+import dns.message
+import dns.query
+import dns.rdataclass
+import dns.rdatatype
+
 def main(argv):
     nameserver = '8.8.8.8'
     hostname = 'hank-it.com'
     expected = "49.12.229.2"
-    record = 'A'
+    record = 1
     port = 53
 
     expect_exists = None
@@ -18,15 +23,22 @@ def main(argv):
             nameserver = arg
         elif opt in "--hostname":
             hostname = arg
-        elif opt in '--record':
-            record = arg
+        #elif opt in '--record':
+            # Record unsupported for now
+            #record = arg
         elif opt in '--port':
             port = int(arg)
         elif opt in '--expected':
             expected = arg
 
     try:
-        answer = dns.resolver.resolve_at(nameserver, hostname, record, port=port)
+        qname = dns.name.from_text(hostname)
+
+        q = dns.message.make_query(qname, record)
+
+        r = dns.query.udp(q, nameserver, port=port)
+
+        answer = r.find_rrset(r.answer, qname, dns.rdataclass.IN, record)
 
         if expected:
             expect_exists = 0
