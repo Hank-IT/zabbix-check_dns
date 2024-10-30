@@ -11,7 +11,7 @@ def main(argv):
     nameserver = '8.8.8.8'
     hostname = 'hank-it.com'
     expected = "49.12.229.2"
-    record = 1
+    record = "A"
     port = 53
 
     expect_exists = None
@@ -23,9 +23,8 @@ def main(argv):
             nameserver = arg
         elif opt in "--hostname":
             hostname = arg
-        #elif opt in '--record':
-            # Record unsupported for now
-            #record = arg
+        elif opt in '--record':
+            record = arg
         elif opt in '--port':
             port = int(arg)
         elif opt in '--expected':
@@ -34,11 +33,11 @@ def main(argv):
     try:
         qname = dns.name.from_text(hostname)
 
-        q = dns.message.make_query(qname, record)
+        q = dns.message.make_query(qname, dns.rdatatype.from_text(record))
 
         r = dns.query.udp(q, nameserver, port=port)
 
-        answer = r.find_rrset(r.answer, qname, dns.rdataclass.IN, record)
+        answer = r.find_rrset(r.answer, qname, dns.rdataclass.IN, dns.rdatatype.from_text(record))
 
         if expected:
             expect_exists = 0
